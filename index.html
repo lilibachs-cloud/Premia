@@ -594,9 +594,12 @@ async function saveSections() {
 // ─── RENDER ─────────────────────
 let sections = [];
 
+
 async function loadSections() {
-  console.log('Laster data fra Supabase');
+  sections = [...defaultSections];
+  renderSections();
 }
+
 
 function saveSections() {
   console.log('Supabase kommer i neste steg');
