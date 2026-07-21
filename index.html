@@ -569,7 +569,27 @@ const defaultSections = [
 </ul>`
   }
 ];
+    icon: '🏥',
+    content: `<p>Bruk gjerne fasttelefon – da vet de automatisk hvor du ringer fra.</p>
+<ul>
+<li><strong>061</strong> – Catsalut. Alle forespørsler om helse, hele døgnet.</li>
+<li><strong>112</strong> – Øyeblikkelig hjelp</li>
+</ul>`
+  }
+];
+  
 
+const supabase = window.supabase.createClient(
+  'https://sdzcgfmfnwzqhybpzudt.supabase.co',
+  'sb_publishable_YjHFAmx6fsTZsQRC5a12MA_fVZi7-S-'
+);
+
+let sections = [];
+
+function saveSections() {
+  console.log('Supabase kommer i neste steg');
+}
+// ─── RENDER ─────────────────────
 let sections = [];
 
 function saveSections() {
