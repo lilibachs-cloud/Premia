@@ -572,9 +572,8 @@ const defaultSections = [
 let sections = [];
 
 function saveSections() {
-  localStorage.setItem('premià-sections', JSON.stringify(sections));
+  console.log('Supabase kommer i neste steg');
 }
-
 // ─── RENDER ────────────────────────────────────────────────────────────
 function renderSections(filter = '') {
   const container = document.getElementById('sections-container');
