@@ -6,7 +6,6 @@
 <title>Premià – Leilighetsguide</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --cream: #f7f3ee;
@@ -568,32 +567,13 @@ const defaultSections = [
 <li><strong>112</strong> – Øyeblikkelig hjelp</li>
 </ul>`
   }
-
 ];
-  
 
-const supabase = window.supabase.createClient(
-  'https://sdzcgfmfnwzqhybpzudt.supabase.co',
-  'sb_publishable_YjHFAmx6fsTZsQRC5a12MA_fVZi7-S-'
-);
+let sections = JSON.parse(localStorage.getItem('premià-sections') || 'null') || defaultSections;
 
-let sections = [];
-
-
-async function saveSections() {
-  console.log('Supabase er koblet til');
+function saveSections() {
+  localStorage.setItem('premià-sections', JSON.stringify(sections));
 }
-
-// ─── RENDER ─────────────────────
-
-
-
-async function loadSections() {
-  sections = [...defaultSections];
-  renderSections();
-}
-
-
 
 // ─── RENDER ────────────────────────────────────────────────────────────
 function renderSections(filter = '') {
@@ -827,7 +807,7 @@ document.getElementById('newSectionTitle').addEventListener('keydown', e => {
 });
 
 // ─── INIT ──────────────────────────────────────────────────────────────
-loadSections();
+renderSections();
 </script>
 </body>
 </html>
