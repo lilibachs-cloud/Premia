@@ -569,7 +569,7 @@ const defaultSections = [
   }
 ];
 
-let sections = JSON.parse(localStorage.getItem('premià-sections') || 'null') || defaultSections;
+let sections = [];
 
 function saveSections() {
   localStorage.setItem('premià-sections', JSON.stringify(sections));
