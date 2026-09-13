@@ -6,7 +6,6 @@
 <title>Premià – Leilighetsguide</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --cream: #f7f3ee;
@@ -169,12 +168,6 @@
     color: var(--text);
     font-size: 14.5px;
   }
-  .editable-content:focus {
-    background: rgba(196,103,58,0.03);
-    border-radius: 6px;
-    padding: 12px;
-    margin: 4px -12px;
-  }
   .editable-content h3 {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.05rem;
@@ -188,48 +181,6 @@
   .editable-content ul { padding-left: 20px; margin-bottom: 10px; }
   .editable-content li { margin-bottom: 4px; }
   .editable-content img { max-width: 100%; border-radius: 8px; margin: 10px 0; }
-
-  .edit-hint {
-    font-size: 11px;
-    color: var(--stone);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    opacity: 0;
-    transition: opacity 0.2s;
-    margin-top: 8px;
-  }
-  .section-body:hover .edit-hint { opacity: 1; }
-
-  /* Lagre-indikator */
-  .save-status {
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin-top: 6px;
-    height: 16px;
-    transition: opacity 0.4s;
-  }
-  .save-status.saving { color: var(--stone); }
-  .save-status.saved { color: #5a9e6f; }
-  .save-status.error { color: #c0392b; }
-
-  .add-section-btn {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 20px;
-    background: none;
-    border: 2px dashed var(--border);
-    border-radius: 12px;
-    color: var(--stone);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    cursor: pointer;
-    width: 100%;
-    transition: border-color 0.2s, color 0.2s;
-    margin-bottom: 20px;
-  }
-  .add-section-btn:hover { border-color: var(--terracotta); color: var(--terracotta); }
 
   .map-container { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 2px 8px var(--shadow); }
   .map-container iframe { width: 100%; height: 580px; border: none; display: block; }
@@ -285,46 +236,6 @@
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
-  /* Modal */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(44,36,32,0.5);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--warm-white);
-    border-radius: 16px;
-    padding: 32px;
-    width: 90%;
-    max-width: 440px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-  }
-  .modal h3 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.4rem;
-    margin-bottom: 20px;
-    color: var(--dark);
-  }
-  .modal input, .modal select {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    margin-bottom: 14px;
-    outline: none;
-    background: white;
-    color: var(--text);
-  }
-  .modal input:focus { border-color: var(--terracotta); }
-  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
-
   @media (max-width: 600px) {
     header { padding: 16px; flex-direction: column; align-items: flex-start; gap: 12px; }
     .header-title { font-size: 1.6rem; }
@@ -335,7 +246,6 @@
     .section-header { padding: 14px 16px; }
     .section-body { padding: 0 16px 16px; }
     .map-container iframe { height: 400px; }
-    .modal { padding: 24px 18px; }
   }
 </style>
 </head>
@@ -365,7 +275,6 @@
       <button class="btn btn-primary" onclick="generatePDF()">⬇ Last ned PDF</button>
     </div>
     <div id="sections-container"><div class="loading">Laster innhold</div></div>
-    <button class="add-section-btn" onclick="openAddModal()">+ Legg til ny seksjon</button>
   </div>
 </div>
 
@@ -392,78 +301,24 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="addModal">
-  <div class="modal">
-    <h3>Ny seksjon</h3>
-    <input type="text" id="newSectionTitle" placeholder="Tittel (f.eks. Vaskemaskin)">
-    <select id="newSectionIcon">
-      <option value="📋">📋 Generelt</option>
-      <option value="⚡">⚡ Elektrisitet</option>
-      <option value="📶">📶 WiFi / Telefon</option>
-      <option value="🔥">🔥 Gass / Oppvarming</option>
-      <option value="❄️">❄️ Air Condition</option>
-      <option value="🚪">🚪 Dører / Vinduer</option>
-      <option value="🗑️">🗑️ Søppel</option>
-      <option value="🏥">🏥 Helse</option>
-      <option value="🫧">🫧 Vaskemaskin</option>
-      <option value="🍽️">🍽️ Kjøkken</option>
-      <option value="📖">📖 Bruksanvisning</option>
-      <option value="🔧">🔧 Vedlikehold</option>
-    </select>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeAddModal()">Avbryt</button>
-      <button class="btn btn-primary" onclick="addSection()">Legg til</button>
-    </div>
-  </div>
-</div>
-
 <script>
-// ─── SUPABASE ──────────────────────────────────────────────────────────
-const SUPABASE_URL = 'https://sdzcgfmfnwzqhybpzudt.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_YjHFAmx6fsTZsQRC5a12MA_fVZi7-S-';
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-
+// ─── DATA ──────────────────────────────────────────────────────────────
+// Innholdet leses fra data.json (samme mappe som denne siden).
+// For å endre innhold: rediger data.json direkte på GitHub.
 let sections = [];
 
-// ─── LAST INN FRA SUPABASE ────────────────────────────────────────────
 async function loadSections() {
-  const { data, error } = await db
-    .from('sections')
-    .select('*')
-    .order('sort_order', { ascending: true });
-
-  if (error) {
-    console.error('Feil ved lasting:', error);
+  try {
+    // Cache-busting (?v=) sikrer at vi ikke får en gammel, mellomlagret versjon
+    const res = await fetch('data.json?v=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    sections = await res.json();
+    sections.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+    renderSections();
+  } catch (err) {
+    console.error('Feil ved lasting:', err);
     document.getElementById('sections-container').innerHTML =
-      '<div class="no-results">Kunne ikke laste innhold. Sjekk tilkoblingen.</div>';
-    return;
-  }
-
-  sections = data;
-  renderSections();
-}
-
-// ─── LAGRE TIL SUPABASE ───────────────────────────────────────────────
-async function saveContent(id, content, statusEl) {
-  statusEl.textContent = '💾 Lagrer…';
-  statusEl.className = 'save-status saving';
-
-  const { error } = await db
-    .from('sections')
-    .update({ content })
-    .eq('id', id);
-
-  if (error) {
-    statusEl.textContent = '⚠️ Feil – ble ikke lagret';
-    statusEl.className = 'save-status error';
-  } else {
-    statusEl.textContent = '✓ Lagret';
-    statusEl.className = 'save-status saved';
-    setTimeout(() => { statusEl.textContent = ''; }, 3000);
-    // Oppdater lokalt array
-    const sec = sections.find(s => s.id === id);
-    if (sec) sec.content = content;
+      '<div class="no-results">Kunne ikke laste innhold. Sjekk at data.json finnes.</div>';
   }
 }
 
@@ -496,12 +351,9 @@ function renderSections(filter = '') {
         <span class="chevron">▾</span>
       </div>
       <div class="section-body">
-        <div class="editable-content" contenteditable="true" data-id="${sec.id}"
-          onblur="handleBlur(this)">
+        <div class="editable-content">
           ${displayContent}
         </div>
-        <div class="save-status"></div>
-        <div class="edit-hint">✏ Klikk i teksten for å redigere · endringer lagres automatisk</div>
       </div>
     `;
     container.appendChild(card);
@@ -510,12 +362,6 @@ function renderSections(filter = '') {
   if (!anyVisible && filter) {
     container.innerHTML = `<div class="no-results">Ingen resultater for "<strong>${filter}</strong>"</div>`;
   }
-}
-
-function handleBlur(el) {
-  const id = el.dataset.id;
-  const statusEl = el.nextElementSibling;
-  saveContent(id, el.innerHTML, statusEl);
 }
 
 function toggleCard(card) { card.classList.toggle('open'); }
@@ -528,40 +374,6 @@ function highlightText(html, query) {
     p.replace(new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'),
       m => `<mark class="highlight">${m}</mark>`)
   ).join('');
-}
-
-// ─── LEGG TIL SEKSJON ─────────────────────────────────────────────────
-function openAddModal() {
-  document.getElementById('addModal').classList.add('open');
-  document.getElementById('newSectionTitle').focus();
-}
-function closeAddModal() {
-  document.getElementById('addModal').classList.remove('open');
-  document.getElementById('newSectionTitle').value = '';
-}
-
-async function addSection() {
-  const title = document.getElementById('newSectionTitle').value.trim();
-  const icon = document.getElementById('newSectionIcon').value;
-  if (!title) return;
-
-  const maxOrder = sections.reduce((max, s) => Math.max(max, s.sort_order || 0), 0);
-
-  const { data, error } = await db
-    .from('sections')
-    .insert([{ title, icon, content: '<p>Skriv innhold her…</p>', sort_order: maxOrder + 1 }])
-    .select()
-    .single();
-
-  if (!error && data) {
-    sections.push(data);
-    closeAddModal();
-    renderSections();
-    setTimeout(() => {
-      const cards = document.querySelectorAll('.section-card');
-      if (cards.length) cards[cards.length - 1].classList.add('open');
-    }, 50);
-  }
 }
 
 // ─── SØK ──────────────────────────────────────────────────────────────
@@ -647,15 +459,6 @@ function generatePDF() {
   }
   doc.save('premià-guide.pdf');
 }
-
-// ─── TASTATUR ─────────────────────────────────────────────────────────
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAddModal(); });
-document.getElementById('addModal').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeAddModal();
-});
-document.getElementById('newSectionTitle').addEventListener('keydown', e => {
-  if (e.key === 'Enter') addSection();
-});
 
 // ─── START ────────────────────────────────────────────────────────────
 loadSections();
